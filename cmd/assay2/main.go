@@ -1,4 +1,6 @@
 package main
-import("log";"os";"github.com/stockyard-dev/stockyard-assay2/internal/license";"github.com/stockyard-dev/stockyard-assay2/internal/server";"github.com/stockyard-dev/stockyard-assay2/internal/store")
-func main(){port:=getEnv("PORT","9980");dataDir:=getEnv("DATA_DIR","./data");licenseKey:=os.Getenv("ASSAY2_LICENSE_KEY");tier:="free";if licenseKey!=""{if license.Validate(licenseKey){tier="pro";log.Println("License valid — Pro tier active")}else{log.Println("Warning: invalid license key")}};db,err:=store.Open(dataDir);if err!=nil{log.Fatalf("store: %v",err)};defer db.Close();srv:=server.New(db,tier);log.Printf("Stockyard Assay II — API Contract Tester listening on :%s (tier: %s)",port,tier);log.Fatal(srv.ListenAndServe(":"+port))}
-func getEnv(key,fallback string)string{if v:=os.Getenv(key);v!=""{return v};return fallback}
+import ("fmt";"log";"net/http";"os";"github.com/stockyard-dev/stockyard-assay2/internal/server";"github.com/stockyard-dev/stockyard-assay2/internal/store")
+func main(){port:=os.Getenv("PORT");if port==""{port="9980"};dataDir:=os.Getenv("DATA_DIR");if dataDir==""{dataDir="./assay2-data"}
+db,err:=store.Open(dataDir);if err!=nil{log.Fatalf("assay2: %v",err)};defer db.Close();srv:=server.New(db)
+fmt.Printf("\n  Assay II — API contract tester\n  Dashboard:  http://localhost:%s/ui\n  API:        http://localhost:%s/api\n\n",port,port)
+log.Printf("assay2: listening on :%s",port);log.Fatal(http.ListenAndServe(":"+port,srv))}
