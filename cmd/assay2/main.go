@@ -1,6 +1,6 @@
 package main
 import ("fmt";"log";"net/http";"os";"github.com/stockyard-dev/stockyard-assay2/internal/server";"github.com/stockyard-dev/stockyard-assay2/internal/store")
 func main(){port:=os.Getenv("PORT");if port==""{port="9700"};dataDir:=os.Getenv("DATA_DIR");if dataDir==""{dataDir="./assay2-data"}
-db,err:=store.Open(dataDir);if err!=nil{log.Fatalf("assay2: %v",err)};defer db.Close();srv:=server.New(db)
+db,err:=store.Open(dataDir);if err!=nil{log.Fatalf("assay2: %v",err)};defer db.Close();srv:=server.New(db,server.DefaultLimits())
 fmt.Printf("\n  Assay II — Self-hosted API contract tester\n  Dashboard:  http://localhost:%s/ui\n  API:        http://localhost:%s/api\n\n",port,port)
 log.Printf("assay2: listening on :%s",port);log.Fatal(http.ListenAndServe(":"+port,srv))}
